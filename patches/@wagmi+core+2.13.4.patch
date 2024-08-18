@@ -1,0 +1,57 @@
+diff --git a/node_modules/@wagmi/core/dist/esm/actions/connect.js b/node_modules/@wagmi/core/dist/esm/actions/connect.js
+index a51f111..c892e45 100644
+--- a/node_modules/@wagmi/core/dist/esm/actions/connect.js
++++ b/node_modules/@wagmi/core/dist/esm/actions/connect.js
+@@ -1,6 +1,7 @@
+ import { ConnectorAlreadyConnectedError, } from '../errors/config.js';
+ /** https://wagmi.sh/core/api/actions/connect */
+ export async function connect(config, parameters) {
++    console.log('connect start', config, parameters);
+     // "Register" connector if not already created
+     let connector;
+     if (typeof parameters.connector === 'function') {
+@@ -30,9 +31,11 @@ export async function connect(config, parameters) {
+             current: connector.uid,
+             status: 'connected',
+         }));
++        console.log('connect finished', accounts, data.chainId);
+         return { accounts, chainId: data.chainId };
+     }
+     catch (error) {
++        console.log('connect error', error);
+         config.setState((x) => ({
+             ...x,
+             // Keep existing connector connected in case of error
+diff --git a/node_modules/@wagmi/core/dist/esm/connectors/injected.js b/node_modules/@wagmi/core/dist/esm/connectors/injected.js
+index 3c19d78..6251138 100644
+--- a/node_modules/@wagmi/core/dist/esm/connectors/injected.js
++++ b/node_modules/@wagmi/core/dist/esm/connectors/injected.js
+@@ -124,12 +124,15 @@ export function injected(parameters = {}) {
+             }
+         },
+         async connect({ chainId, isReconnecting } = {}) {
++            console.log('>> connect',isReconnecting )
+             const provider = await this.getProvider();
+             if (!provider)
+                 throw new ProviderNotFoundError();
+             let accounts = [];
+             if (isReconnecting)
+-                accounts = await this.getAccounts().catch(() => []);
++                accounts = await this.getAccounts().catch((e) =>{
++            console.log(e);
++            return []});
+             else if (shimDisconnect) {
+                 // Attempt to show another prompt for selecting account if `shimDisconnect` flag is enabled
+                 try {
+@@ -249,9 +252,11 @@ export function injected(parameters = {}) {
+         },
+         async getAccounts() {
+             const provider = await this.getProvider();
++            console.log('getAccounts', provider);
+             if (!provider)
+                 throw new ProviderNotFoundError();
+             const accounts = await provider.request({ method: 'eth_accounts' });
++            console.log('>>> accounts', accounts);
+             return accounts.map((x) => getAddress(x));
+         },
+         async getChainId() {

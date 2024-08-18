@@ -3,11 +3,10 @@ import { useAccount } from 'wagmi';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { useEffect } from 'react';
 
 const Home: NextPage = () => {
-  const { isConnected } = useAccount();
-  console.log('isConnected', isConnected);
+  const account = useAccount();
+  console.log('account', account);
   return (
     <div className={styles.container}>
       <Head>
