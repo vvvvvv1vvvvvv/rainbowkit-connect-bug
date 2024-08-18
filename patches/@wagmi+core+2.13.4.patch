@@ -1,5 +1,5 @@
 diff --git a/node_modules/@wagmi/core/dist/esm/actions/connect.js b/node_modules/@wagmi/core/dist/esm/actions/connect.js
-index a51f111..c892e45 100644
+index a51f111..480c6d4 100644
 --- a/node_modules/@wagmi/core/dist/esm/actions/connect.js
 +++ b/node_modules/@wagmi/core/dist/esm/actions/connect.js
 @@ -1,6 +1,7 @@
@@ -10,7 +10,15 @@ index a51f111..c892e45 100644
      // "Register" connector if not already created
      let connector;
      if (typeof parameters.connector === 'function') {
-@@ -30,9 +31,11 @@ export async function connect(config, parameters) {
+@@ -9,6 +10,7 @@ export async function connect(config, parameters) {
+     else
+         connector = parameters.connector;
+     // Check if connector is already connected
++    console.log('Check if connector is already connected');
+     if (connector.uid === config.state.current)
+         throw new ConnectorAlreadyConnectedError();
+     try {
+@@ -30,9 +32,11 @@ export async function connect(config, parameters) {
              current: connector.uid,
              status: 'connected',
          }));
@@ -23,15 +31,16 @@ index a51f111..c892e45 100644
              ...x,
              // Keep existing connector connected in case of error
 diff --git a/node_modules/@wagmi/core/dist/esm/connectors/injected.js b/node_modules/@wagmi/core/dist/esm/connectors/injected.js
-index 3c19d78..6251138 100644
+index 3c19d78..1b3ad86 100644
 --- a/node_modules/@wagmi/core/dist/esm/connectors/injected.js
 +++ b/node_modules/@wagmi/core/dist/esm/connectors/injected.js
-@@ -124,12 +124,15 @@ export function injected(parameters = {}) {
+@@ -124,12 +124,16 @@ export function injected(parameters = {}) {
              }
          },
          async connect({ chainId, isReconnecting } = {}) {
-+            console.log('>> connect',isReconnecting )
++            console.log('>> isReconnecting', isReconnecting)
              const provider = await this.getProvider();
++            console.log('>> shimDisconnect', shimDisconnect);
              if (!provider)
                  throw new ProviderNotFoundError();
              let accounts = [];
@@ -43,7 +52,26 @@ index 3c19d78..6251138 100644
              else if (shimDisconnect) {
                  // Attempt to show another prompt for selecting account if `shimDisconnect` flag is enabled
                  try {
-@@ -249,9 +252,11 @@ export function injected(parameters = {}) {
+@@ -145,8 +149,10 @@ export function injected(parameters = {}) {
+                         const sortedAccounts = await this.getAccounts();
+                         accounts = sortedAccounts;
+                     }
++                    console.log('wallet_requestPermissions', accounts);
+                 }
+                 catch (err) {
++                    console.log('>> shimDisconnect err', err);
+                     const error = err;
+                     // Not all injected providers support `wallet_requestPermissions` (e.g. MetaMask iOS).
+                     // Only bubble up error if user rejects request
+@@ -198,6 +204,7 @@ export function injected(parameters = {}) {
+                 // Add connected shim if no target exists
+                 if (!parameters.target)
+                     await config.storage?.setItem('injected.connected', true);
++                console.log('before inject connect finished', accounts, currentChainId);
+                 return { accounts, chainId: currentChainId };
+             }
+             catch (err) {
+@@ -249,9 +256,11 @@ export function injected(parameters = {}) {
          },
          async getAccounts() {
              const provider = await this.getProvider();
