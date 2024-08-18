@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "patch-package && next start"
+    "build": "patch-package && next build",
+    "start": "next start"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.1.3",
