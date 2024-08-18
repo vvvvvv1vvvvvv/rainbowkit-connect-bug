@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "patch-package && next start"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.1.3",
